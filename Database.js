@@ -4,10 +4,10 @@ const mssql = require("mssql");
 const dbConnect = async () => {
   try {
     const pool = await mssql.connect({
-      user: "konglovecpe",     // เปลี่ยนเป็น username ของคุณ
-      password: "0881795204konG", // เปลี่ยนเป็น password ของคุณ
-      server: "konglovecpe.database.windows.net",      // หรือ server ที่คุณใช้งาน
-      database: "FITNESS451", // ชื่อ database ที่จะเชื่อมต่อ
+      user: ".....",     // เปลี่ยนเป็น username ของคุณ
+      password: "....", // เปลี่ยนเป็น password ของคุณ
+      server: "....",      // หรือ server ที่คุณใช้งาน
+      database: "....", // ชื่อ database ที่จะเชื่อมต่อ
       options: {
         encrypt: true, 
         trustServerCertificate: false, 

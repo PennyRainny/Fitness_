@@ -4,6 +4,7 @@ const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const dbConnect = require('./Database');
 const { body, validationResult } = require('express-validator');
+const Login_signUp = require('./Login_signUp'); 
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -15,8 +16,9 @@ app.use(cookieSession({
     maxAge: 3600 * 1000, // 1 ชั่วโมง
 }));
 
-// เรียกใช้ Routes
-app.use('/api/auth', require('./routes/auth'));
+app.use("/", Login_signUp); 
+
+
 
 // Server Start
 app.listen(3000, () => console.log("Server is running on port 3000"));

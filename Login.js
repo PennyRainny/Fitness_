@@ -2,42 +2,66 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign, FontAwesome, Feather } from '@expo/vector-icons';
+import { Database } from '../Database';
+import { hashPassword } from '../hashPassword'; 
+
+
+
+
 function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // ✅ เพิ่มตัวแสดงสถานะโหลด
+  const [loading, setLoading] = useState(false); 
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
+
+  
+//เพิ่มฟังค์ชั่นสำหรับ Login ใช้ฐานข้อมูล Supabase
+const handleLogin = async () => {
+  if (!email || !password) {
+    Alert.alert('Error', 'Please enter both email and password');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // 1. ดึง user จาก table userinfo
+    const { data: users, error: queryError } = await Database
+      .from('userinfo')
+      .select('*')
+      .eq('email', email)
+      .limit(1);
+
+    if (queryError) throw queryError;
+
+    const user = users?.[0];
+
+    if (!user) {
+      Alert.alert('Login Failed', 'User not found');
       return;
     }
 
-    setLoading(true); // ✅ เริ่มโหลด
-    try {
-      const response = await fetch('http://10.0.2.2:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    // 2. ตรวจสอบรหัสผ่าน (hash password ที่กรอกแล้วเปรียบเทียบกับ hash ในฐานข้อมูล)
+    const hashedInputPassword = await hashPassword(password);  // ใช้ hashPassword ที่เราสร้างไว้
+    const passwordMatch = hashedInputPassword === user.passwordhash;  // เปรียบเทียบ hash
 
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert('Success', 'Logged in successfully!');
-        navigation.navigate('CreatProfile'); 
-      } else {
-        Alert.alert('Login Failed', data.message || 'Invalid email or password');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again later.');
-    } finally {
-      setLoading(false); // ✅ หยุดโหลด
+    if (!passwordMatch) {
+      Alert.alert('Login Failed', 'Invalid password');
+      return;
     }
-  };
+
+    // ✅ เข้าระบบสำเร็จ
+    Alert.alert('Success', 'Logged in successfully!');
+    navigation.navigate('CreateProfile', { email });
+  } catch (error) {
+    console.error('Login Error:', error);
+    Alert.alert('Error', 'Something went wrong. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
+  //===================================================================================
 
   const handleGoogleLogin = () => {
     Alert.alert('Google Login', 'Google login');

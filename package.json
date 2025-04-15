@@ -12,6 +12,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/native": "^7.1.4",
     "@react-navigation/stack": "^7.2.8",
+    "@supabase/supabase-js": "^2.49.4",
     "bcrypt": "^5.1.1",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",

@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign, FontAwesome, Feather } from '@expo/vector-icons';
+import { Database } from '../Database';
+import { hashPassword } from '../hashPassword'; 
+
+
+
 
 function SignUpScreen({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -11,32 +16,45 @@ function SignUpScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
+  //การสมัครสมาชิกลงฐานข้อมูล Supabase
+
+
   const handleSignUp = async () => {
     if (!firstName || !lastName || !email || !password) {
-        Alert.alert('Error', 'All fields are required!');
-        return;
+      Alert.alert('Error', 'All fields are required!');
+      return;
     }
-
+  
     try {
-        const response = await fetch('http://10.0.2.2:3000/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, lastName, email, password }),
-        });
-
-        const result = await response.json();
-        console.log('Server Response:', result);
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Registration failed');
-        }
-
-        Alert.alert('Success', 'Registration successful!');
+      // 🔐 ใช้ expo-crypto ในการ hash password
+      const hashedPassword = await hashPassword(password);  // ใช้ฟังก์ชัน hashPassword ที่เราสร้าง
+  
+      const { error: insertError } = await Database
+        .from('userinfo')
+        .insert([
+          {
+            firstname: firstName,
+            lastname: lastName,
+            email: email,
+            passwordhash: hashedPassword, // เก็บ hashed password
+          }
+        ]);
+  
+      if (insertError) throw insertError;
+  
+      Alert.alert('Success', 'Registration successful!');
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPassword('');
+          navigation.navigate('Login');
     } catch (error) {
-        console.error(' Register Error:', error);
-        Alert.alert('Error', error.message);
+      console.error('❌ Register Error:', error);
+      Alert.alert('Error', error.message || 'Something went wrong');
     }
-};
+  };
+  
+//=======================================================================================================
 
   const handleGoogleLogin = () => {
     Alert.alert('Google Login', 'Google login ');
@@ -226,7 +244,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   checkboxText: {
-    fontSize: 10, // ปรับขนาดตัวอักษร
+    fontSize: 10, 
     color: '#000',
     marginLeft: 10,
   },

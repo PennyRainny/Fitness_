@@ -1,0 +1,16 @@
+แก้ไรมั้ง
+1.เปลี่ยนไปใช้ PostgreSQL ใช้เป็น Supabase (ฟรี)
+2.เพิ่ม hashPassword (Function ในการ hashPassword)
+3.แก้ login กับ SignUp ให้ดึงข้อมูลไปจาก Database ได้เลยไม่ต้องมีไฟล์ จาก backend ให้เสียเวลา
+
+================================================
+โหลดไฟล์ใน git ของก้องมา
+เอา Login กับ SignUp แก้
+เพิ่มไฟล์ Database
+เพิ่มไฟล์ hashPassword
+
+dependency ที่ลงเพิ่ม
+npx expo install expo-crypto
+npm install @supabase/supabase-js
+
+
